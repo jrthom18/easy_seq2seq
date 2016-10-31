@@ -22,6 +22,9 @@ Init seq2seq model
     2. Create decode_line function that takes message as input
 '''
 #_________________________________________________________________
+import sys
+import os.static_url_path
+sys.path.append(os.path.abspath(os.path.join(os.path.dirname(__file__), os.path.pardir)))
 import tensorflow as tf
 import execute
 
@@ -31,4 +34,4 @@ sess, model, enc_vocab, rev_dec_vocab = execute.init_session(sess, conf='seq2seq
 
 # start app
 if (__name__ == "__main__"): 
-    app.run(port = 5000) 
+    app.run(host='0.0.0.0', debug = False) 
