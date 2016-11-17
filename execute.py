@@ -247,14 +247,16 @@ def runTestScript():
     for q in range(0, len(originalQuestions)):
       sentence = originalQuestions[q]
       correctAnswer = correctAnswers[q]
-      print("Original Q:\t\t{0}\n".format(sentence))
-      print("Correct A:\t\t{0}\n".format(correctAnswer))
-      print("Bot:\t\t{0}\n".format(print_output(model, sess, enc_vocab, rev_dec_vocab, sentence)))
+      print("Original Q:\t{0}".format(sentence))
+      print("Correct A:\t{0}".format(correctAnswer))
+      print('Bot: ')
+      print("{0}".format(print_output(model, sess, enc_vocab, rev_dec_vocab, sentence)))
       for v in range(0, 3):
         sentence = questionVariations[q][v]
-        print("Modified Q:\t\t{0}\n".format(sentence))
-        print("Correct A:\t\t{0}\n".format(correctAnswer))
-        print("Bot:\t\t{0}\n".format(print_output(model, sess, enc_vocab, rev_dec_vocab, sentence)))
+        print("Modified Q:\t{0}".format(sentence))
+        print("Correct A:\t{0}".format(correctAnswer))
+        print('Bot: ')
+        print("{0}".format(print_output(model, sess, enc_vocab, rev_dec_vocab, sentence)))
 
 def print_output(model, sess, enc_vocab, rev_dec_vocab, sentence):
   # Get token-ids for the input sentence.
