@@ -249,14 +249,12 @@ def runTestScript():
       correctAnswer = correctAnswers[q]
       print("Original Q:\t{0}".format(sentence))
       print("Correct A:\t{0}".format(correctAnswer))
-      print('Bot: ')
-      print("{0}".format(print_output(model, sess, enc_vocab, rev_dec_vocab, sentence)))
+      print_output(model, sess, enc_vocab, rev_dec_vocab, sentence)
       for v in range(0, 3):
         sentence = questionVariations[q][v]
         print("Modified Q:\t{0}".format(sentence))
         print("Correct A:\t{0}".format(correctAnswer))
-        print('Bot: ')
-        print("{0}".format(print_output(model, sess, enc_vocab, rev_dec_vocab, sentence)))
+        print_output(model, sess, enc_vocab, rev_dec_vocab, sentence)
 
 def print_output(model, sess, enc_vocab, rev_dec_vocab, sentence):
   # Get token-ids for the input sentence.
@@ -273,7 +271,7 @@ def print_output(model, sess, enc_vocab, rev_dec_vocab, sentence):
   if data_utils.EOS_ID in outputs:
     outputs = outputs[:outputs.index(data_utils.EOS_ID)]
   # Print out French sentence corresponding to outputs.
-  print(" ".join([tf.compat.as_str(rev_dec_vocab[output]) for output in outputs]))
+  print("Bot:\t" + " ".join([tf.compat.as_str(rev_dec_vocab[output]) for output in outputs]))
 
 
 def self_test():
