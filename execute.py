@@ -22,6 +22,7 @@ import os
 import random
 import sys
 import time
+import datetime
 
 import numpy as np
 from six.moves import xrange  # pylint: disable=redefined-builtin
@@ -228,6 +229,10 @@ def decode():
 
 def runTestScript():
   print('Automated testing script for short Q&A...')
+  ts = time.time()
+  st = datetime.datetime.fromtimestamp(ts).strftime('%Y-%m-%d %H:%M:%S')
+  print("Time of test: " + st))
+
   with tf.Session() as sess:
     # Create model and load parameters.
     model = create_model(sess, True)
@@ -247,6 +252,7 @@ def runTestScript():
     for q in range(0, len(originalQuestions)):
       sentence = originalQuestions[q]
       correctAnswer = correctAnswers[q]
+      print("---------------------------------------------------")
       print("Original Q:\t{0}".format(sentence))
       print("Correct A:\t{0}".format(correctAnswer))
       print_output(model, sess, enc_vocab, rev_dec_vocab, sentence)
@@ -255,6 +261,7 @@ def runTestScript():
         print("Modified Q:\t{0}".format(sentence))
         print("Correct A:\t{0}".format(correctAnswer))
         print_output(model, sess, enc_vocab, rev_dec_vocab, sentence)
+      print("---------------------------------------------------")
 
 def print_output(model, sess, enc_vocab, rev_dec_vocab, sentence):
   # Get token-ids for the input sentence.
@@ -271,7 +278,7 @@ def print_output(model, sess, enc_vocab, rev_dec_vocab, sentence):
   if data_utils.EOS_ID in outputs:
     outputs = outputs[:outputs.index(data_utils.EOS_ID)]
   # Print out French sentence corresponding to outputs.
-  print("Bot:\t" + " ".join([tf.compat.as_str(rev_dec_vocab[output]) for output in outputs]))
+  print("Bot:\t\t" + " ".join([tf.compat.as_str(rev_dec_vocab[output]) for output in outputs]))
 
 
 def self_test():
