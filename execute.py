@@ -249,14 +249,14 @@ def runTestScript():
       correctAnswer = correctAnswers[q]
       print("Original Q:\t\t{0}\n".format(sentence))
       print("Correct A:\t\t{0}\n".format(correctAnswer))
-      print("Bot:\t\t{0}\n".format(print_output(sentence)))
+      print("Bot:\t\t{0}\n".format(print_output(model, sess, enc_vocab, rev_dec_vocab, sentence)))
       for v in range(0, 3):
         sentence = questionVariations[q][v]
         print("Modified Q:\t\t{0}\n".format(sentence))
         print("Correct A:\t\t{0}\n".format(correctAnswer))
-        print("Bot:\t\t{0}\n".format(print_output(sentence)))
+        print("Bot:\t\t{0}\n".format(print_output(model, sess, enc_vocab, rev_dec_vocab, sentence)))
 
-def print_output(sentence):
+def print_output(model, sess, enc_vocab, rev_dec_vocab, sentence):
   # Get token-ids for the input sentence.
   token_ids = data_utils.sentence_to_token_ids(tf.compat.as_bytes(sentence), enc_vocab)
   # Which bucket does it belong to?
