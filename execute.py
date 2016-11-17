@@ -227,7 +227,7 @@ def decode():
       sentence = sys.stdin.readline()
 
 def runTestScript():
-  print 'Automated testing script for short Q&A...'
+  print('Automated testing script for short Q&A...')
   with tf.Session() as sess:
     # Create model and load parameters.
     model = create_model(sess, True)
@@ -247,14 +247,14 @@ def runTestScript():
     for q in range(0, len(originalQuestions)):
       sentence = originalQuestions[q]
       correctAnswer = correctAnswers[q]
-      print 'Original Q:\t\t{0}\n'.format(sentence)
-      print 'Correct A:\t\t{0}\n'.format(correctAnswer)
-      print 'Bot:\t\t{0}\n'.format(print_output(sentence))
+      print("Original Q:\t\t{0}\n".format(sentence))
+      print("Correct A:\t\t{0}\n".format(correctAnswer))
+      print("Bot:\t\t{0}\n".format(print_output(sentence)))
       for v in range(0, 3):
         sentence = questionVariations[q][v]
-        print 'Modified Q:\t\t{0}\n'.format(sentence)
-        print 'Correct A:\t\t{0}\n'.format(correctAnswer)
-        print 'Bot:\t\t{0}\n'.format(print_output(sentence))
+        print("Modified Q:\t\t{0}\n".format(sentence))
+        print("Correct A:\t\t{0}\n".format(correctAnswer))
+        print("Bot:\t\t{0}\n".format(print_output(sentence)))
 
 def print_output(sentence):
   # Get token-ids for the input sentence.
