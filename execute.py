@@ -231,7 +231,7 @@ def runTestScript():
   print('Automated testing script for short Q&A...')
   ts = time.time()
   st = datetime.datetime.fromtimestamp(ts).strftime('%Y-%m-%d %H:%M:%S')
-  print("Time of test: " + st))
+  print("Time of test: " + st)
 
   with tf.Session() as sess:
     # Create model and load parameters.
