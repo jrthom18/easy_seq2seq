@@ -252,12 +252,13 @@ def runTestScript():
     for q in range(0, len(originalQuestions)):
       sentence = originalQuestions[q]
       correctAnswer = correctAnswers[q]
-      print("---------------------------------------------------")
+      sentence = sentence.lower()
       print("Original Q:\t{0}".format(sentence))
       print("Correct A:\t{0}".format(correctAnswer))
       print_output(model, sess, enc_vocab, rev_dec_vocab, sentence)
       for v in range(0, 3):
         sentence = questionVariations[q][v]
+        sentence = sentence.lower()
         print("Modified Q:\t{0}".format(sentence))
         print("Correct A:\t{0}".format(correctAnswer))
         print_output(model, sess, enc_vocab, rev_dec_vocab, sentence)
