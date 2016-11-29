@@ -264,7 +264,6 @@ def runTestScript():
           testResults.write("Original Q:\t{0}".format(sentence))
           testResults.write("Correct A:\t{0}".format(correctAnswer))
         print_output(model, sess, enc_vocab, rev_dec_vocab, sentence)
-        print("---------------------------------------------------")
       
       '''
       for v in range(0, 3):
@@ -291,7 +290,8 @@ def print_output(model, sess, enc_vocab, rev_dec_vocab, sentence):
     outputs = outputs[:outputs.index(data_utils.EOS_ID)]
   # Print out French sentence corresponding to outputs.
   with open("testResults.txt", "a") as testResults:
-    testResults.write("Bot:\t\t" + " ".join([tf.compat.as_str(rev_dec_vocab[output]) for output in outputs]))
+    testResults.write("Bot's A >>\t" + " ".join([tf.compat.as_str(rev_dec_vocab[output]) for output in outputs]))
+    testResults.write("---------------------------------------------------")
 
 
 def self_test():
