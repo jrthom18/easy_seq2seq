@@ -261,8 +261,8 @@ def runTestScript():
 
       if len(sentence.split()) < 10 and len(correctAnswer.split()) < 10:
         with open("testResults.txt", "a") as testResults:
-          testResults.write("Original Q:\t{0}".format(sentence))
-          testResults.write("Correct A:\t{0}".format(correctAnswer))
+          testResults.write("Original Q:\t{0}\n".format(sentence))
+          testResults.write("Correct A:\t{0}\n".format(correctAnswer))
         print_output(model, sess, enc_vocab, rev_dec_vocab, sentence)
       
       '''
@@ -291,7 +291,7 @@ def print_output(model, sess, enc_vocab, rev_dec_vocab, sentence):
   # Print out French sentence corresponding to outputs.
   with open("testResults.txt", "a") as testResults:
     testResults.write("Bot's A >>\t" + " ".join([tf.compat.as_str(rev_dec_vocab[output]) for output in outputs]))
-    testResults.write("---------------------------------------------------")
+    testResults.write("\n---------------------------------------------------\n")
 
 
 def self_test():
