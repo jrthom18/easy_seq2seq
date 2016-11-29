@@ -152,6 +152,9 @@ def train():
       start_time = time.time()
       encoder_inputs, decoder_inputs, target_weights = model.get_batch(
           train_set, bucket_id)
+      
+      # TODO: We could set forward_only parameter to True here occasionally?
+
       _, step_loss, _ = model.step(sess, encoder_inputs, decoder_inputs,
                                    target_weights, bucket_id, False)
       step_time += (time.time() - start_time) / gConfig['steps_per_checkpoint']
@@ -245,24 +248,32 @@ def runTestScript():
     enc_vocab, _ = data_utils.initialize_vocabulary(enc_vocab_path)
     _, rev_dec_vocab = data_utils.initialize_vocabulary(dec_vocab_path)
 
-    originalQuestions = ['Can I copy from Finder the current Path','for what should I use fn key by default on mac book pro','How can Find My iPhone be working with no data plan','Is it possible to queue songs on the iPhone','Force simple UNIX path names for optimal us of command line apps','How can you change the mouse cursor in OSX','Can you tell if updates came from OS X caching server','Why do certain apps fill the background of Mission Control in Mavericks','I\'m looking for a quick entry TODO application that syncs across an iPhone and my laptop','Play Audio from a Mac over an iPhone Call','Mapping Home and End of Apple keyboard in VMWare fusion','How do I use GCC on El Capitan','How to import DVD\'s to iTunes','HP P4515 printer in 10.7.4 - what driver','Is iphone purchased from Canadian online Apple Store factory unlocked','Can I share a 3G connection from an iPhone/iPad by creating a Wi-fi hotspot','Is storing an iMac sideways safe','How can I change the default text color in Mail','How to clean a sticky Magic Trackpad click','Can anyone recommend an app for creating flowcharts and diagrams',' How Do I Run Xcode','Dragging a window to a space doesn\'t work the first time','How can I control iTunes from another Mac','iMac won\'t recognise .MTS videos on my hard drive, how can I play them']
-    correctAnswers = ['I recommend DTerm, which gives you a hovering command prompt','It swaps the function of the function keys between the OS X function and the actual F1-F12 key','Yes, the device can communicate with Find my iPhone over Wi-Fi','You can create an on the go playlist directly on the iPhone that acts like a queue','Unfortunately, you just have to remember to do it each time you make a file or directory','Sorry, Apple doesn\'t allow people to change the mouse cursor anymore','The caching server will print to log when a client requests an update','This appears to have been fixed in either Yosemite or the latest version of Office','Check out OmniFocus (available for Mac, iPhone and iPad)','You should be able to do something like this with a product like IK Multimedia\'s iRig (or a generic equivalent..','KeyMap4MacBook can actually do this','Instead of invoking using gcc you need to call gcc-4.9','You can use Handbrake to rip it to a file, then just copy to iTunes','It appears HP supports this printer with the P4014 series drivers','Yes, they are unlocked,  The price is going to be substantially higher since its not the subsidized price','Yes, it\'s called "Personal Hotspot" by Apple and works on iPhone 4 and 4S','Yes, it won\'t hurt the iMac','Unfortunately I\'m unaware of any way to do this without a workaround','Try some Goo-B-Gone or other citrus based cleaning fluid.','If you can stretch your budget, get OmniGraffle for Mac','Xcode is located in /Developer/Applications/Xcode.app','Confirmed: the mountain lion 10.8.2 update resolves this problem.','I\'ve been using TuneConnect to do pretty much what you\'re after','Try VideoLan']
-    questionVariations = [['copy from Finder the current path','Can I copy the current path from Finder','can i copy from finder the current path'],['for what should I use fn key by default on macbook pro','what should I use the fn key for on mac book pro','using the fn key on mac book pro'],['how can find my iphone be working with no data plan','Does Find My iPhone work with no data plan','will Find My iPhone still work with no data plan'],['Is it possible to queue songs on iphone','How to queue songs on iPhone','Can I queue songs on an iPhone'],['how to force simple UNIX path names for optimal use of command line apps','Force simple UNIX paths for optimal use of command line apps','force simple UNIX path names for use of command line apps'],['how can you change the mouse cursor in osx','can I change the mouse cursor in OSX','can you change the mouse cursor in OSX'],['how can you tell if updates came from OS X caching server','can you tell if updates come from the OSX caching server','Can you tell if updates are from the OS X caching server'],['why do some apps fill the background of Mission Control in Mavericks','why do certain apps fill the back ground of mission control in mavericks','Why do some apps fill the background of Mission Control in OSX Mavericks'],['what is a quick entry TODO application that syncs across iPhone and laptop','I\'m looking for a quick entry TODO application that syncs across iPhone and my laptop','What is a quick entry TODO application that sycs across my iPhone and my laptop'],['How do you play audio from a Mac over an iPhone call','How to play Audio from a Mac over an iPhone call','Can you play audio from a Mac over an iPhone call'],['Map Home and End of Apple keyboard in VMWare fusion','Mapping Home and End on Apple key board in VMWare Fusion','How to map Home and End of Apply keyboard in VMWare fusion'],['How can I use GCC on El Capitan','How do you use gcc on el capitan','How to use GCC on El Capitan'],['How do you import DVD\'s to iTunes','How to import DVD to itunes','How can I import DVDs to iTunes'],['What driver for HP P4515 printer in 10.7.4','What driver do I use for the HP P4515 printer on 10.7.4','Driver for HP P4515 printer in 10.7.4'],['Is an iPhone purchased from the Canadian online Apple Store unlocked','Are iPhones purchased from Canadian online Apple Store unlocked','Is the iphone from Canadian online Apple Store factory unlocked'],['Can I share a 3g connection from iPhone/iPad by creating a Wi-fi hotspot','Can I share a 3G connection from an iPhone by creating a wifi hotspot','Can you share 3G data from an iPhone/iPad by creating a Wi-fi hotspot'],['is storing an imac sideways safe','Can I store an iMac sideways safely','Is it safe to store an iMac sideways'],['Can I change the default text color in Mail','Can you change the default text color in mail','Is it possible to change the text color in Mail'],['How do you clean a sticky Magic Trackpad click','How can I clean a sticky Magic Trackpad','How to clean a Magic Trackpad '],['recommend an app for creating flowcharts and diagrams','What is a good app for creating flowcharts and diagrams','Can you recommend a good app for creating flow charts and diagrams'],['how do i run xcode','How do you run Xcode','How can I run Xcode'],['Why won\'t dragging a window to a space work the first time','dragging a window to a space does not work the first time','Dragging window doesn\'t work the first time'],['Can I control iTunes from another Mac','How do you control itunes from another mac','How to control iTunes from a different Mac'],['how can I play .MTS videos on my hard drive','iMac doesn\'t recognize MTS videos, how can I play them?','imac won\'t recognize the .MTS videos on my hard drive so how can I play them']]
+    testEnc = open("data/test.enc", "r")
+    testDec = open("data/test.dec", "r")
+
+    originalQuestions = testEnc.read().split('\n')
+    correctAnswers = testDec.read().split('\n')
 
     for q in range(0, len(originalQuestions)):
       sentence = originalQuestions[q]
       correctAnswer = correctAnswers[q]
       sentence = sentence.lower()
-      print("Original Q:\t{0}".format(sentence))
-      print("Correct A:\t{0}".format(correctAnswer))
-      print_output(model, sess, enc_vocab, rev_dec_vocab, sentence)
+
+      if len(sentence.split()) < 10 and len(correctAnswer.split()) < 10:
+        with open("testResults.txt", "a") as testResults:
+          testResults.write("Original Q:\t{0}".format(sentence))
+          testResults.write("Correct A:\t{0}".format(correctAnswer))
+        print_output(model, sess, enc_vocab, rev_dec_vocab, sentence)
+        print("---------------------------------------------------")
+      
+      '''
       for v in range(0, 3):
         sentence = questionVariations[q][v]
         sentence = sentence.lower()
         print("Modified Q:\t{0}".format(sentence))
         print("Correct A:\t{0}".format(correctAnswer))
         print_output(model, sess, enc_vocab, rev_dec_vocab, sentence)
-      print("---------------------------------------------------")
+      '''
 
 def print_output(model, sess, enc_vocab, rev_dec_vocab, sentence):
   # Get token-ids for the input sentence.
@@ -279,7 +290,8 @@ def print_output(model, sess, enc_vocab, rev_dec_vocab, sentence):
   if data_utils.EOS_ID in outputs:
     outputs = outputs[:outputs.index(data_utils.EOS_ID)]
   # Print out French sentence corresponding to outputs.
-  print("Bot:\t\t" + " ".join([tf.compat.as_str(rev_dec_vocab[output]) for output in outputs]))
+  with open("testResults.txt", "a") as testResults:
+    testResults.write("Bot:\t\t" + " ".join([tf.compat.as_str(rev_dec_vocab[output]) for output in outputs]))
 
 
 def self_test():
