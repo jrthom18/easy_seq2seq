@@ -232,9 +232,14 @@ def decode():
 
 def runTestScript():
   print('Automated testing script for short Q&A...')
-  ts = time.time()
-  st = datetime.datetime.fromtimestamp(ts).strftime('%Y-%m-%d %H:%M:%S')
-  print("Time of test: " + st)
+  #ts = time.time()
+  #st = datetime.datetime.fromtimestamp(ts).strftime('%Y-%m-%d %H:%M:%S')
+  #print("Time of test: " + st)
+
+  with open("shortResults.txt", "a") as shortResults:
+    shortResults.write("Short Q&A (Less than 10 words)\n\n")
+  with open("longerResults.txt", "a") as longerResults:
+    longerResults.write("Longer Q&A (10-15 words)\n\n")
 
   with tf.Session() as sess:
     # Create model and load parameters.
@@ -253,6 +258,7 @@ def runTestScript():
 
     originalQuestions = testEnc.read().split('\n')
     correctAnswers = testDec.read().split('\n')
+    questionCntr = 0
 
     for q in range(0, len(originalQuestions)):
       sentence = originalQuestions[q]
@@ -260,10 +266,18 @@ def runTestScript():
       sentence = sentence.lower()
 
       if len(sentence.split()) < 10 and len(correctAnswer.split()) < 10:
-        with open("testResults.txt", "a") as testResults:
-          testResults.write("Original Q:\t{0}\n".format(sentence))
-          testResults.write("Correct A:\t{0}\n".format(correctAnswer))
-        print_output(model, sess, enc_vocab, rev_dec_vocab, sentence)
+        questionCntr += 1
+        with open("shortResults.txt", "a") as shortResults:
+          shortResults.write("Original Q:\t{0}\n".format(sentence))
+          shortResults.write("Correct A:\t{0}\n".format(correctAnswer))
+        print_output(model, sess, enc_vocab, rev_dec_vocab, sentence, "shortResults.txt")
+
+      elif len(sentence.split()) > 10 and len(correctAnswer.split()) > 10 and len(sentence.split()) < 15 and len(correctAnswer.split()) < 15:
+        questionCntr += 1
+        with open("longerResults.txt", "a") as longerResults:
+          longerResults.write("Original Q:\t{0}\n".format(sentence))
+          longerResults.write("Correct A:\t{0}\n".format(correctAnswer))
+        print_output(model, sess, enc_vocab, rev_dec_vocab, sentence, "longerResults.txt")
       
       '''
       for v in range(0, 3):
@@ -274,7 +288,9 @@ def runTestScript():
         print_output(model, sess, enc_vocab, rev_dec_vocab, sentence)
       '''
 
-def print_output(model, sess, enc_vocab, rev_dec_vocab, sentence):
+    print(questionCntr)
+
+def print_output(model, sess, enc_vocab, rev_dec_vocab, sentence, folder_path):
   # Get token-ids for the input sentence.
   token_ids = data_utils.sentence_to_token_ids(tf.compat.as_bytes(sentence), enc_vocab)
   # Which bucket does it belong to?
@@ -289,8 +305,8 @@ def print_output(model, sess, enc_vocab, rev_dec_vocab, sentence):
   if data_utils.EOS_ID in outputs:
     outputs = outputs[:outputs.index(data_utils.EOS_ID)]
   # Print out French sentence corresponding to outputs.
-  with open("testResults.txt", "a") as testResults:
-    testResults.write("Bot's A >>\t" + " ".join([tf.compat.as_str(rev_dec_vocab[output]) for output in outputs]))
+  with open(folder_path, "a") as testResults:
+    testResults.write("Jombee >>\t" + " ".join([tf.compat.as_str(rev_dec_vocab[output]) for output in outputs]))
     testResults.write("\n---------------------------------------------------\n")
 
 
