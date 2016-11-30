@@ -240,6 +240,10 @@ def runTestScript():
     shortResults.write("Short Q&A (Less than 10 words)\n\n")
   with open("longerResults.txt", "a") as longerResults:
     longerResults.write("Longer Q&A (10-15 words)\n\n")
+  with open("testSetResultsShort.txt", "a") as shortTestResults:
+    shortTestResults.write("Short Test Q&A (Unseen, less than 10 words)\n\n")
+  with open("testSetResultsLong.txt", "a") as longerTestResults:
+    longerTestResults.write("Longer Test Q&A (Unseen, 10-15 words)\n\n")
 
   with tf.Session() as sess:
     # Create model and load parameters.
@@ -252,13 +256,33 @@ def runTestScript():
 
     enc_vocab, _ = data_utils.initialize_vocabulary(enc_vocab_path)
     _, rev_dec_vocab = data_utils.initialize_vocabulary(dec_vocab_path)
-
+    
+    trainEnc = open("data/train.enc", "r")
+    trainDec = open("data/train.dec", "r")
     testEnc = open("data/test.enc", "r")
     testDec = open("data/test.dec", "r")
 
-    originalQuestions = testEnc.read().split('\n')
-    correctAnswers = testDec.read().split('\n')
-    questionCntr = 0
+    originalQuestions = trainEnc.read().split('\n')
+    correctAnswers = trainDec.read().split('\n')
+    testQuestions = testEnc.read().split('\n')
+    testAnswers = testDec.read().split('\n')
+
+    for q in range(0, len(testQuestions)):
+      sentence = testQuestions[q]
+      correctAnswer = testAnswers[q]
+      sentence = sentence.lower()
+
+      if len(sentence.split()) < 10 and len(correctAnswer.split()) < 10:
+        with open("testSetResultsShort.txt", "a") as testSetResults:
+          testSetResults.write("Test Set Q:\t{0}\n".format(sentence))
+          testSetResults.write("Correct A:\t{0}\n".format(correctAnswer))
+        print_output(model, sess, enc_vocab, rev_dec_vocab, sentence, "testSetResultsShort.txt")
+        
+      elif len(sentence.split()) > 10 and len(correctAnswer.split()) > 10 and len(sentence.split()) < 15 and len(correctAnswer.split()) < 15:
+        with open("testSetResultsLong.txt", "a") as testSetResults:
+          testSetResults.write("Test Set Q:\t{0}\n".format(sentence))
+          testSetResults.write("Correct A:\t{0}\n".format(correctAnswer))
+        print_output(model, sess, enc_vocab, rev_dec_vocab, sentence, "testSetResultsLong.txt")
 
     for q in range(0, len(originalQuestions)):
       sentence = originalQuestions[q]
@@ -266,14 +290,12 @@ def runTestScript():
       sentence = sentence.lower()
 
       if len(sentence.split()) < 10 and len(correctAnswer.split()) < 10:
-        questionCntr += 1
         with open("shortResults.txt", "a") as shortResults:
           shortResults.write("Original Q:\t{0}\n".format(sentence))
           shortResults.write("Correct A:\t{0}\n".format(correctAnswer))
         print_output(model, sess, enc_vocab, rev_dec_vocab, sentence, "shortResults.txt")
 
       elif len(sentence.split()) > 10 and len(correctAnswer.split()) > 10 and len(sentence.split()) < 15 and len(correctAnswer.split()) < 15:
-        questionCntr += 1
         with open("longerResults.txt", "a") as longerResults:
           longerResults.write("Original Q:\t{0}\n".format(sentence))
           longerResults.write("Correct A:\t{0}\n".format(correctAnswer))
@@ -287,8 +309,6 @@ def runTestScript():
         print("Correct A:\t{0}".format(correctAnswer))
         print_output(model, sess, enc_vocab, rev_dec_vocab, sentence)
       '''
-
-    print(questionCntr)
 
 def print_output(model, sess, enc_vocab, rev_dec_vocab, sentence, folder_path):
   # Get token-ids for the input sentence.
