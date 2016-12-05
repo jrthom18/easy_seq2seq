@@ -237,9 +237,9 @@ def runTestScript():
   #print("Time of test: " + st)
 
   with open("shortResults.txt", "a") as shortResults:
-    shortResults.write("Short Q&A (Less than 10 words)\n\n")
+    shortResults.write("Short Q&A (Seen, less than 10 words)\n\n")
   with open("longerResults.txt", "a") as longerResults:
-    longerResults.write("Longer Q&A (10-15 words)\n\n")
+    longerResults.write("Longer Q&A (Seen, 10-15 words)\n\n")
   with open("testSetResultsShort.txt", "a") as shortTestResults:
     shortTestResults.write("Short Test Q&A (Unseen, less than 10 words)\n\n")
   with open("testSetResultsLong.txt", "a") as longerTestResults:
