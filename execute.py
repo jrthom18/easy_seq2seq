@@ -152,8 +152,6 @@ def train():
       start_time = time.time()
       encoder_inputs, decoder_inputs, target_weights = model.get_batch(
           train_set, bucket_id)
-      
-      # TODO: We could set forward_only parameter to True here occasionally?
 
       _, step_loss, _ = model.step(sess, encoder_inputs, decoder_inputs,
                                    target_weights, bucket_id, False)
@@ -266,49 +264,49 @@ def runTestScript():
     correctAnswers = trainDec.read().split('\n')
     testQuestions = testEnc.read().split('\n')
     testAnswers = testDec.read().split('\n')
+    questionIterator = 0
 
     for q in range(0, len(testQuestions)):
+      questionIterator += 1
       sentence = testQuestions[q]
       correctAnswer = testAnswers[q]
       sentence = sentence.lower()
 
       if len(sentence.split()) < 10 and len(correctAnswer.split()) < 10:
         with open("testSetResultsShort.txt", "a") as testSetResults:
+          testSetResults.write("{0}.\n".format(questionIterator))
           testSetResults.write("Test Set Q:\t{0}\n".format(sentence))
           testSetResults.write("Correct A:\t{0}\n".format(correctAnswer))
         print_output(model, sess, enc_vocab, rev_dec_vocab, sentence, "testSetResultsShort.txt")
         
       elif len(sentence.split()) > 10 and len(correctAnswer.split()) > 10 and len(sentence.split()) < 15 and len(correctAnswer.split()) < 15:
         with open("testSetResultsLong.txt", "a") as testSetResults:
+          testSetResults.write("{0}.\n".format(questionIterator))
           testSetResults.write("Test Set Q:\t{0}\n".format(sentence))
           testSetResults.write("Correct A:\t{0}\n".format(correctAnswer))
         print_output(model, sess, enc_vocab, rev_dec_vocab, sentence, "testSetResultsLong.txt")
 
+    questionIterator = 0
+
     for q in range(0, len(originalQuestions)):
+      questionIterator += 1
       sentence = originalQuestions[q]
       correctAnswer = correctAnswers[q]
       sentence = sentence.lower()
 
       if len(sentence.split()) < 10 and len(correctAnswer.split()) < 10:
         with open("shortResults.txt", "a") as shortResults:
+          shortResults.write("{0}.\n".format(questionIterator))
           shortResults.write("Original Q:\t{0}\n".format(sentence))
           shortResults.write("Correct A:\t{0}\n".format(correctAnswer))
         print_output(model, sess, enc_vocab, rev_dec_vocab, sentence, "shortResults.txt")
 
       elif len(sentence.split()) > 10 and len(correctAnswer.split()) > 10 and len(sentence.split()) < 15 and len(correctAnswer.split()) < 15:
         with open("longerResults.txt", "a") as longerResults:
+          longerResults.write("{0}.\n".format(questionIterator))
           longerResults.write("Original Q:\t{0}\n".format(sentence))
           longerResults.write("Correct A:\t{0}\n".format(correctAnswer))
         print_output(model, sess, enc_vocab, rev_dec_vocab, sentence, "longerResults.txt")
-      
-      '''
-      for v in range(0, 3):
-        sentence = questionVariations[q][v]
-        sentence = sentence.lower()
-        print("Modified Q:\t{0}".format(sentence))
-        print("Correct A:\t{0}".format(correctAnswer))
-        print_output(model, sess, enc_vocab, rev_dec_vocab, sentence)
-      '''
 
 def print_output(model, sess, enc_vocab, rev_dec_vocab, sentence, folder_path):
   # Get token-ids for the input sentence.
@@ -402,8 +400,8 @@ if __name__ == '__main__':
         # start training
         train()
     elif gConfig['mode'] == 'test':
-        # interactive decode
         runTestScript()
+        # interactive decode:
         #decode()
     else:
         # wrong way to execute "serve"
