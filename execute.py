@@ -100,7 +100,8 @@ def create_model(session, forward_only):
       return model
 
   ckpt = tf.train.get_checkpoint_state(gConfig['working_directory'])
-  if ckpt and tf.gfile.Exists(ckpt.model_checkpoint_path):
+  #if ckpt and tf.gfile.Exists(ckpt.model_checkpoint_path):
+  if ckpt and ckpt.model_checkpoint_path:
     print("Reading model parameters from %s" % ckpt.model_checkpoint_path)
     model.saver.restore(session, ckpt.model_checkpoint_path)
   else:
@@ -172,9 +173,7 @@ def train():
         previous_losses.append(loss)
         
         # Save checkpoint and zero timer and loss.
-        #checkpoint_path = os.path.join(gConfig['working_directory'], "seq2seq.ckpt")
-        # Trying to work around TF checkpointing V2 bug...
-        checkpoint_path = os.path.join(gConfig['working_directory'], "seq2seq")
+        checkpoint_path = os.path.join(gConfig['working_directory'], "seq2seq.ckpt")
         model.saver.save(sess, checkpoint_path, global_step=model.global_step)
         step_time, loss = 0.0, 0.0
 
@@ -233,7 +232,7 @@ def decode():
       sentence = sys.stdin.readline()
 
 def runTestScript():
-  
+
   with open("shortResults.txt", "a") as shortResults:
     shortResults.write("Short Q&A (Seen, less than 10 words)\n\n")
   with open("longerResults.txt", "a") as longerResults:
