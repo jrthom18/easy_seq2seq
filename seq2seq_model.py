@@ -164,7 +164,9 @@ class Seq2SeqModel(object):
         self.updates.append(opt.apply_gradients(
             zip(clipped_gradients, params), global_step=self.global_step))
 
-    self.saver = tf.train.Saver(tf.global_variables())
+    self.saver = tf.train.Saver(tf.global_variables(), keep_checkpoint_every_n_hours=2.0)
+    #Revert to deprecated saver to avoid bug in V2
+    #self.saver = tf.train.Saver(tf.global_variables(), keep_checkpoint_every_n_hours=2.0, write_version=1)
 
   def step(self, session, encoder_inputs, decoder_inputs, target_weights,
            bucket_id, forward_only):

@@ -170,10 +170,14 @@ def train():
         if len(previous_losses) > 2 and loss > max(previous_losses[-3:]):
           sess.run(model.learning_rate_decay_op)
         previous_losses.append(loss)
+        
         # Save checkpoint and zero timer and loss.
-        checkpoint_path = os.path.join(gConfig['working_directory'], "seq2seq.ckpt")
+        #checkpoint_path = os.path.join(gConfig['working_directory'], "seq2seq.ckpt")
+        # Trying to work around TF checkpointing V2 bug...
+        checkpoint_path = os.path.join(gConfig['working_directory'], "seq2seq")
         model.saver.save(sess, checkpoint_path, global_step=model.global_step)
         step_time, loss = 0.0, 0.0
+
         # Run evals on development set and print their perplexity.
         for bucket_id in xrange(len(_buckets)):
           if len(dev_set[bucket_id]) == 0:
@@ -229,18 +233,14 @@ def decode():
       sentence = sys.stdin.readline()
 
 def runTestScript():
-  print('Automated testing script for short Q&A...')
-  #ts = time.time()
-  #st = datetime.datetime.fromtimestamp(ts).strftime('%Y-%m-%d %H:%M:%S')
-  #print("Time of test: " + st)
-
+  
   with open("shortResults.txt", "a") as shortResults:
     shortResults.write("Short Q&A (Seen, less than 10 words)\n\n")
   with open("longerResults.txt", "a") as longerResults:
     longerResults.write("Longer Q&A (Seen, 10-15 words)\n\n")
-  with open("testSetResultsShort.txt", "a") as shortTestResults:
+  with open("shortTestSetResults.txt", "a") as shortTestResults:
     shortTestResults.write("Short Test Q&A (Unseen, less than 10 words)\n\n")
-  with open("testSetResultsLong.txt", "a") as longerTestResults:
+  with open("longTestSetResults.txt", "a") as longerTestResults:
     longerTestResults.write("Longer Test Q&A (Unseen, 10-15 words)\n\n")
 
   with tf.Session() as sess:
@@ -267,41 +267,41 @@ def runTestScript():
     questionIterator = 0
 
     for q in range(0, len(testQuestions)):
-      questionIterator += 1
       sentence = testQuestions[q]
       correctAnswer = testAnswers[q]
       sentence = sentence.lower()
 
       if len(sentence.split()) < 10 and len(correctAnswer.split()) < 10:
-        with open("testSetResultsShort.txt", "a") as testSetResults:
+        questionIterator += 1
+        with open("shortTestSetResults.txt", "a") as testSetResults:
           testSetResults.write("{0}.\n".format(questionIterator))
           testSetResults.write("Test Set Q:\t{0}\n".format(sentence))
           testSetResults.write("Correct A:\t{0}\n".format(correctAnswer))
-        print_output(model, sess, enc_vocab, rev_dec_vocab, sentence, "testSetResultsShort.txt")
-        
+        print_output(model, sess, enc_vocab, rev_dec_vocab, sentence, "shortTestSetResults.txt")
       elif len(sentence.split()) > 10 and len(correctAnswer.split()) > 10 and len(sentence.split()) < 15 and len(correctAnswer.split()) < 15:
-        with open("testSetResultsLong.txt", "a") as testSetResults:
+        questionIterator += 1
+        with open("longTestSetResults.txt", "a") as testSetResults:
           testSetResults.write("{0}.\n".format(questionIterator))
           testSetResults.write("Test Set Q:\t{0}\n".format(sentence))
           testSetResults.write("Correct A:\t{0}\n".format(correctAnswer))
-        print_output(model, sess, enc_vocab, rev_dec_vocab, sentence, "testSetResultsLong.txt")
+        print_output(model, sess, enc_vocab, rev_dec_vocab, sentence, "longTestSetResults.txt")
 
     questionIterator = 0
 
     for q in range(0, len(originalQuestions)):
-      questionIterator += 1
       sentence = originalQuestions[q]
       correctAnswer = correctAnswers[q]
       sentence = sentence.lower()
 
       if len(sentence.split()) < 10 and len(correctAnswer.split()) < 10:
+        questionIterator += 1
         with open("shortResults.txt", "a") as shortResults:
           shortResults.write("{0}.\n".format(questionIterator))
           shortResults.write("Original Q:\t{0}\n".format(sentence))
           shortResults.write("Correct A:\t{0}\n".format(correctAnswer))
         print_output(model, sess, enc_vocab, rev_dec_vocab, sentence, "shortResults.txt")
-
       elif len(sentence.split()) > 10 and len(correctAnswer.split()) > 10 and len(sentence.split()) < 15 and len(correctAnswer.split()) < 15:
+        questionIterator += 1
         with open("longerResults.txt", "a") as longerResults:
           longerResults.write("{0}.\n".format(questionIterator))
           longerResults.write("Original Q:\t{0}\n".format(sentence))
