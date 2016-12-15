@@ -49,7 +49,10 @@ def get_config(config_file='seq2seq.ini'):
 
 # We use a number of buckets and pad to the closest one for efficiency.
 # See seq2seq_model.Seq2SeqModel for details of how they work.
-_buckets = [(5, 10), (10, 15), (20, 25), (40, 50)]
+# Bucket sizes for word-level model
+#_buckets = [(8, 12), (12, 20), (16, 30), (20, 45), (30, 75)]
+# Bucket sizes for char-level model
+_buckets = [(30, 60), (40, 90), (50, 120), (70, 170), (100, 230), (120, 350)]
 
 
 def read_data(source_path, target_path, max_size=None):
@@ -100,7 +103,6 @@ def create_model(session, forward_only):
       return model
 
   ckpt = tf.train.get_checkpoint_state(gConfig['working_directory'])
-  #if ckpt and tf.gfile.Exists(ckpt.model_checkpoint_path):
   if ckpt and ckpt.model_checkpoint_path:
     print("Reading model parameters from %s" % ckpt.model_checkpoint_path)
     model.saver.restore(session, ckpt.model_checkpoint_path)
@@ -173,7 +175,8 @@ def train():
         previous_losses.append(loss)
         
         # Save checkpoint and zero timer and loss.
-        checkpoint_path = os.path.join(gConfig['working_directory'], "seq2seq.ckpt")
+        checkpoint_file_name = "seq2seq.ckpt-%.2f-" % (perplexity) 
+        checkpoint_path = os.path.join(gConfig['working_directory'], checkpoint_file_name)
         model.saver.save(sess, checkpoint_path, global_step=model.global_step)
         step_time, loss = 0.0, 0.0
 
@@ -225,7 +228,7 @@ def decode():
       # If there is an EOS symbol in outputs, cut them at that point.
       if data_utils.EOS_ID in outputs:
         outputs = outputs[:outputs.index(data_utils.EOS_ID)]
-      # Print out French sentence corresponding to outputs.
+      # Print out sentence corresponding to outputs.
       print(" ".join([tf.compat.as_str(rev_dec_vocab[output]) for output in outputs]))
       print("> ", end="")
       sys.stdout.flush()
@@ -263,7 +266,8 @@ def runTestScript():
     correctAnswers = trainDec.read().split('\n')
     testQuestions = testEnc.read().split('\n')
     testAnswers = testDec.read().split('\n')
-    questionIterator = 0
+    shortQuestionIterator = 0
+    longQuestionIterator = 0
 
     for q in range(0, len(testQuestions)):
       sentence = testQuestions[q]
@@ -271,21 +275,22 @@ def runTestScript():
       sentence = sentence.lower()
 
       if len(sentence.split()) < 10 and len(correctAnswer.split()) < 10:
-        questionIterator += 1
+        shortQuestionIterator += 1
         with open("shortTestSetResults.txt", "a") as testSetResults:
-          testSetResults.write("{0}.\n".format(questionIterator))
+          testSetResults.write("{0}.\n".format(shortQuestionIterator))
           testSetResults.write("Test Set Q:\t{0}\n".format(sentence))
           testSetResults.write("Correct A:\t{0}\n".format(correctAnswer))
         print_output(model, sess, enc_vocab, rev_dec_vocab, sentence, "shortTestSetResults.txt")
       elif len(sentence.split()) > 10 and len(correctAnswer.split()) > 10 and len(sentence.split()) < 15 and len(correctAnswer.split()) < 15:
-        questionIterator += 1
+        longQuestionIterator += 1
         with open("longTestSetResults.txt", "a") as testSetResults:
-          testSetResults.write("{0}.\n".format(questionIterator))
+          testSetResults.write("{0}.\n".format(longQuestionIterator))
           testSetResults.write("Test Set Q:\t{0}\n".format(sentence))
           testSetResults.write("Correct A:\t{0}\n".format(correctAnswer))
         print_output(model, sess, enc_vocab, rev_dec_vocab, sentence, "longTestSetResults.txt")
 
-    questionIterator = 0
+    shortQuestionIterator = 0
+    longQuestionIterator = 0
 
     for q in range(0, len(originalQuestions)):
       sentence = originalQuestions[q]
@@ -293,16 +298,16 @@ def runTestScript():
       sentence = sentence.lower()
 
       if len(sentence.split()) < 10 and len(correctAnswer.split()) < 10:
-        questionIterator += 1
+        shortQuestionIterator += 1
         with open("shortResults.txt", "a") as shortResults:
-          shortResults.write("{0}.\n".format(questionIterator))
+          shortResults.write("{0}.\n".format(shortQuestionIterator))
           shortResults.write("Original Q:\t{0}\n".format(sentence))
           shortResults.write("Correct A:\t{0}\n".format(correctAnswer))
         print_output(model, sess, enc_vocab, rev_dec_vocab, sentence, "shortResults.txt")
       elif len(sentence.split()) > 10 and len(correctAnswer.split()) > 10 and len(sentence.split()) < 15 and len(correctAnswer.split()) < 15:
-        questionIterator += 1
+        longQuestionIterator += 1
         with open("longerResults.txt", "a") as longerResults:
-          longerResults.write("{0}.\n".format(questionIterator))
+          longerResults.write("{0}.\n".format(longQuestionIterator))
           longerResults.write("Original Q:\t{0}\n".format(sentence))
           longerResults.write("Correct A:\t{0}\n".format(correctAnswer))
         print_output(model, sess, enc_vocab, rev_dec_vocab, sentence, "longerResults.txt")
@@ -321,9 +326,9 @@ def print_output(model, sess, enc_vocab, rev_dec_vocab, sentence, folder_path):
   # If there is an EOS symbol in outputs, cut them at that point.
   if data_utils.EOS_ID in outputs:
     outputs = outputs[:outputs.index(data_utils.EOS_ID)]
-  # Print out French sentence corresponding to outputs.
+  # Print out sentence corresponding to outputs.
   with open(folder_path, "a") as testResults:
-    testResults.write("Jombee >>\t" + " ".join([tf.compat.as_str(rev_dec_vocab[output]) for output in outputs]))
+    testResults.write("Jombee >>\t" + "".join([tf.compat.as_str(rev_dec_vocab[output]) for output in outputs]))
     testResults.write("\n---------------------------------------------------\n")
 
 
