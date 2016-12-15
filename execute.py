@@ -175,7 +175,7 @@ def train():
         previous_losses.append(loss)
         
         # Save checkpoint and zero timer and loss.
-        checkpoint_file_name = "seq2seq.ckpt-%.2f-" % (perplexity) 
+        checkpoint_file_name = "seq2seq.ckpt-%.2f" % (perplexity) 
         checkpoint_path = os.path.join(gConfig['working_directory'], checkpoint_file_name)
         model.saver.save(sess, checkpoint_path, global_step=model.global_step)
         step_time, loss = 0.0, 0.0
