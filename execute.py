@@ -328,7 +328,7 @@ def print_output(model, sess, enc_vocab, rev_dec_vocab, sentence, folder_path):
     outputs = outputs[:outputs.index(data_utils.EOS_ID)]
   # Print out sentence corresponding to outputs.
   with open(folder_path, "a") as testResults:
-    testResults.write("Jombee >>\t" + "".join([tf.compat.as_str(rev_dec_vocab[output]) for output in outputs]))
+    testResults.write("Jombee >>\t" + " ".join([tf.compat.as_str(rev_dec_vocab[output]) for output in outputs]))
     testResults.write("\n---------------------------------------------------\n")
 
 

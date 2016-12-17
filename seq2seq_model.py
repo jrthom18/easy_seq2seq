@@ -154,7 +154,8 @@ class Seq2SeqModel(object):
     if not forward_only:
       self.gradient_norms = []
       self.updates = []
-      opt = tf.train.AdamOptimizer()
+      #opt = tf.train.AdamOptimizer()
+      opt = tf.train.RMSPropOptimizer(0.001)
       for b in xrange(len(buckets)):
         gradients = tf.gradients(self.losses[b], params)
         clipped_gradients, norm = tf.clip_by_global_norm(gradients,
@@ -163,7 +164,7 @@ class Seq2SeqModel(object):
         self.updates.append(opt.apply_gradients(
             zip(clipped_gradients, params), global_step=self.global_step))
 
-    self.saver = tf.train.Saver(tf.global_variables(), keep_checkpoint_every_n_hours=1.0)
+    self.saver = tf.train.Saver(tf.global_variables(), keep_checkpoint_every_n_hours=2.0)
 
   def step(self, session, encoder_inputs, decoder_inputs, target_weights,
            bucket_id, forward_only):
