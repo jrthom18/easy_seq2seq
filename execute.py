@@ -50,7 +50,7 @@ def get_config(config_file='seq2seq.ini'):
 # We use a number of buckets and pad to the closest one for efficiency.
 # See seq2seq_model.Seq2SeqModel for details of how they work.
 # Bucket sizes for word-level model
-_buckets = [(6, 8), (8, 12), (12, 20), (20, 30), (30, 45), (40, 75)]
+_buckets = [(8, 12), (12, 20), (20, 30), (30, 45), (40, 75)]
 # Bucket sizes for char-level model
 #_buckets = [(30, 60), (40, 90), (50, 120), (70, 170), (100, 230), (120, 350)]
 
