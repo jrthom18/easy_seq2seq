@@ -104,7 +104,7 @@ class Seq2SeqModel(object):
 
     # The seq2seq function: we use embedding for the input and attention.
     def seq2seq_f(encoder_inputs, decoder_inputs, do_decode):
-      return tf.nn.seq2seq.embedding_attention_seq2seq(
+      return tf.nn.seq2seq.embedding_rnn_seq2seq(
           encoder_inputs, decoder_inputs, cell,
           num_encoder_symbols=source_vocab_size,
           num_decoder_symbols=target_vocab_size,
@@ -251,7 +251,7 @@ class Seq2SeqModel(object):
 
       # Encoder inputs are padded and then reversed.
       encoder_pad = [data_utils.PAD_ID] * (encoder_size - len(encoder_input))
-      encoder_inputs.append(list(encoder_input + encoder_pad))
+      encoder_inputs.append(list(reversed(encoder_input + encoder_pad)))
 
       # Decoder inputs get an extra "GO" symbol, and are padded then.
       decoder_pad_size = decoder_size - len(decoder_input) - 1
