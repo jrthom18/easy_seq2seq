@@ -50,7 +50,7 @@ def get_config(config_file='seq2seq.ini'):
 # We use a number of buckets and pad to the closest one for efficiency.
 # See seq2seq_model.Seq2SeqModel for details of how they work.
 # Bucket sizes for word-level model
-_buckets = [(8, 12), (12, 20), (20, 30), (30, 45), (40, 75)]
+_buckets = [(6, 6), (12, 12), (20, 20), (35, 35), (60, 60)]
 # Bucket sizes for char-level model
 #_buckets = [(30, 60), (40, 90), (50, 120), (70, 170), (100, 230), (120, 350)]
 
@@ -236,13 +236,13 @@ def decode():
 
 def runTestScript():
 
-  with open("shortResults.txt", "a") as shortResults:
+  with open("shortSeenResults.txt", "a") as shortResults:
     shortResults.write("Short Q&A (Seen, less than 10 words)\n\n")
-  with open("longerResults.txt", "a") as longerResults:
+  with open("longSeenResults.txt", "a") as longerResults:
     longerResults.write("Longer Q&A (Seen, 10-15 words)\n\n")
-  with open("shortTestSetResults.txt", "a") as shortTestResults:
+  with open("shortUnseenResults.txt", "a") as shortTestResults:
     shortTestResults.write("Short Test Q&A (Unseen, less than 10 words)\n\n")
-  with open("longTestSetResults.txt", "a") as longerTestResults:
+  with open("longUnseenResults.txt", "a") as longerTestResults:
     longerTestResults.write("Longer Test Q&A (Unseen, 10-15 words)\n\n")
 
   with tf.Session() as sess:
@@ -276,18 +276,18 @@ def runTestScript():
 
       if len(sentence.split()) < 10 and len(correctAnswer.split()) < 10:
         shortQuestionIterator += 1
-        with open("shortTestSetResults.txt", "a") as testSetResults:
+        with open("shortUnseenResults.txt", "a") as testSetResults:
           testSetResults.write("{0}.\n".format(shortQuestionIterator))
           testSetResults.write("Test Set Q:\t{0}\n".format(sentence))
           testSetResults.write("Correct A:\t{0}\n".format(correctAnswer))
-        print_output(model, sess, enc_vocab, rev_dec_vocab, sentence, "shortTestSetResults.txt")
+        print_output(model, sess, enc_vocab, rev_dec_vocab, sentence, "shortUnseenResults.txt")
       elif len(sentence.split()) > 10 and len(correctAnswer.split()) > 10 and len(sentence.split()) < 15 and len(correctAnswer.split()) < 15:
         longQuestionIterator += 1
-        with open("longTestSetResults.txt", "a") as testSetResults:
+        with open("longUnseenResults.txt", "a") as testSetResults:
           testSetResults.write("{0}.\n".format(longQuestionIterator))
           testSetResults.write("Test Set Q:\t{0}\n".format(sentence))
           testSetResults.write("Correct A:\t{0}\n".format(correctAnswer))
-        print_output(model, sess, enc_vocab, rev_dec_vocab, sentence, "longTestSetResults.txt")
+        print_output(model, sess, enc_vocab, rev_dec_vocab, sentence, "longUnseenResults.txt")
 
     shortQuestionIterator = 0
     longQuestionIterator = 0
@@ -299,18 +299,18 @@ def runTestScript():
 
       if len(sentence.split()) < 10 and len(correctAnswer.split()) < 10:
         shortQuestionIterator += 1
-        with open("shortResults.txt", "a") as shortResults:
+        with open("shortSeenResults.txt", "a") as shortResults:
           shortResults.write("{0}.\n".format(shortQuestionIterator))
           shortResults.write("Original Q:\t{0}\n".format(sentence))
           shortResults.write("Correct A:\t{0}\n".format(correctAnswer))
-        print_output(model, sess, enc_vocab, rev_dec_vocab, sentence, "shortResults.txt")
+        print_output(model, sess, enc_vocab, rev_dec_vocab, sentence, "shortSeenResults.txt")
       elif len(sentence.split()) > 10 and len(correctAnswer.split()) > 10 and len(sentence.split()) < 15 and len(correctAnswer.split()) < 15:
         longQuestionIterator += 1
-        with open("longerResults.txt", "a") as longerResults:
+        with open("longSeenResults.txt", "a") as longerResults:
           longerResults.write("{0}.\n".format(longQuestionIterator))
           longerResults.write("Original Q:\t{0}\n".format(sentence))
           longerResults.write("Correct A:\t{0}\n".format(correctAnswer))
-        print_output(model, sess, enc_vocab, rev_dec_vocab, sentence, "longerResults.txt")
+        print_output(model, sess, enc_vocab, rev_dec_vocab, sentence, "longSeenResults.txt")
 
 def print_output(model, sess, enc_vocab, rev_dec_vocab, sentence, folder_path):
   # Get token-ids for the input sentence.
