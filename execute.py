@@ -404,9 +404,9 @@ if __name__ == '__main__':
         # start training
         train()
     elif gConfig['mode'] == 'test':
-        runTestScript()
+        #runTestScript()
         # interactive decode:
-        #decode()
+        decode()
     else:
         # wrong way to execute "serve"
         #   Use : >> python ui/app.py
